@@ -6,6 +6,17 @@ import sys
 from utils import *
 
 
+class_names = [
+    'travelling', 
+    'lifting brick', 
+    'lifting rebar', 
+    'measuring rebar', 
+    'tying rebar', 
+    'hammering', 
+    'drilling', 
+    'idle'
+]
+
 def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     print('validation at epoch {}'.format(epoch))
 
@@ -18,6 +29,10 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     top5 = AverageMeter()
 
     end_time = time.time()
+
+    correct_pred = {classname: 0 for classname in class_names}
+    total_pred = {classname: 0 for classname in class_names}    
+
     for i, (inputs, targets) in enumerate(data_loader):
         data_time.update(time.time() - end_time)
 
@@ -26,9 +41,18 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         with torch.no_grad():
             inputs = Variable(inputs)
             targets = Variable(targets)
+
         outputs = model(inputs)
         loss = criterion(outputs, targets)
+
+        _, predictions = torch.max(outputs, 1)
+        for label, prediction in zip(targets, predictions):
+            if label == prediction:
+                correct_pred[class_names[label]] += 1
+            total_pred[class_names[label]] += 1
+
         prec1, prec5 = calculate_accuracy(outputs.data, targets.data, topk=(1,5))
+
         top1.update(prec1, inputs.size(0))
         top5.update(prec5, inputs.size(0))
 
@@ -51,6 +75,11 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
                   loss=losses,
                   top1=top1,
                   top5=top5))
+
+
+    for classname, correct_count in correct_pred.items():
+        accuracy = 100 * float(correct_count) / total_pred[classname]
+        print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
 
     logger.log({'epoch': epoch,
                 'loss': losses.avg.item(),

@@ -64,22 +64,22 @@ def calculate_accuracy(output, target, topk=(1,)):
 
     res = []
     for k in topk:
-        correct_k = correct[:k].view(-1).float().sum(0)
+        correct_k = correct[:k].contiguous().view(-1).float().sum(0)
         res.append(correct_k.mul_(100.0 / batch_size))
     return res
 
 
-def save_checkpoint(state, is_best, opt):
-    torch.save(state, '%s/%s_checkpoint.pth' % (opt.result_path, opt.store_name))
+def save_checkpoint(state, i, is_best, opt):
+    torch.save(state, '%s/%s_checkpoint%s_acc.pth' % (opt.result_path, opt.store_name, i))
     if is_best:
-        shutil.copyfile('%s/%s_checkpoint.pth' % (opt.result_path, opt.store_name),'%s/%s_best.pth' % (opt.result_path, opt.store_name))
+        shutil.copyfile('%s/%s_checkpoint%s.pth' % (opt.result_path, opt.store_name, i),'%s/%s_best.pth' % (opt.result_path, opt.store_name))
 
 
-def adjust_learning_rate(optimizer, epoch, opt):
-    """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-    lr_new = opt.learning_rate * (0.1 ** (sum(epoch >= np.array(opt.lr_steps))))
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr_new
-        #param_group['lr'] = opt.learning_rate
+# def adjust_learning_rate(optimizer, epoch, opt):
+#     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+#     lr_new = opt.learning_rate * (0.1 ** (sum(epoch >= np.array(opt.lr_steps))))
+#     for param_group in optimizer.param_groups:
+#         param_group['lr'] = lr_new
+#         #param_group['lr'] = opt.learning_rate
 
 

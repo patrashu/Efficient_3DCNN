@@ -107,6 +107,7 @@ def get_video_names_annotations_framenum(data, subset):
 
 def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                  sample_duration):
+    
     data = load_annotation_data(annotation_path)
     video_names, annotations, framenum = get_video_names_annotations_framenum(data, subset)
     class_to_idx = get_class_labels(data)
@@ -114,6 +115,7 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
     for name, label in class_to_idx.items():
         idx_to_class[label] = name
 
+    # print(video_names)
     dataset = []
     for i in range(len(video_names)):
         if i % 1000 == 0:
@@ -121,13 +123,12 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
 
         video_path = os.path.join(root_path, video_names[i])
         if not os.path.exists(video_path):
-            print(video_path)
-            continue
-
+            continue    
+        
         n_frames = framenum[i]
         if n_frames <= 0:
             continue
-
+    
         begin_t = 1
         end_t = n_frames
         sample = {
@@ -209,13 +210,16 @@ class Kinetics(data.Dataset):
         frame_indices = self.data[index]['frame_indices']
         if self.temporal_transform is not None:
            frame_indices = self.temporal_transform(frame_indices)
+           
         clip = self.loader(path, frame_indices, self.sample_duration)
+        
         if self.spatial_transform is not None:
             self.spatial_transform.randomize_parameters()
             clip = [self.spatial_transform(img) for img in clip]
+        
         clip = torch.stack(clip, 0).permute(1, 0, 2, 3)
-
         target = self.data[index]
+
         if self.target_transform is not None:
             target = self.target_transform(target)
 

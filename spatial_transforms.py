@@ -371,10 +371,6 @@ class MultiScaleRandomCrop(object):
 
 
 
-
-
-
-
 class SpatialElasticDisplacement(object):
 
     def __init__(self, sigma=3.0, alpha=1.0, order=3, cval=0, mode="constant"):
@@ -465,6 +461,21 @@ class RandomResize(object):
 
     def randomize_parameters(self):
         self.resize_const = random.uniform(0.9, 1.1)
+
+
+class Resize(object):
+
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, img):
+        ret_img = img.resize((self.size, self.size))
+
+        return ret_img
+
+    def randomize_parameters(self):
+        self.resize_const = random.uniform(0.9, 1.1)
+
 
 
 

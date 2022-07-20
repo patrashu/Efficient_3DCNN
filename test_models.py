@@ -37,7 +37,7 @@ def calculate_accuracy(outputs, targets, topk=(1,)):
     ret = []
     for k in topk:
         correct_k = correct[:k].float().sum().data[0]
-        ret.append(correct_k / batch_size)
+        ret.append(correct_k / batch_size) 
 
     return ret
 """
@@ -97,10 +97,12 @@ else:
 
 spatial_transform = Compose([
     #Scale(opt.sample_size),
-    Scale(112),
-    CenterCrop(112),
-    ToTensor(opt.norm_value), norm_method
+    # Scale(112),
+    # CenterCrop(112),
+    Resize(opt.sample_size),
+    ToTensor(opt.norm_value),
     ])
+    
 temporal_transform = TemporalCenterCrop(opt.sample_duration)
 #temporal_transform = TemporalBeginCrop(opt.sample_duration)
 #temporal_transform = TemporalEndCrop(opt.sample_duration)
@@ -136,7 +138,7 @@ top5 = AverageMeter()
 end_time = time.time()
 for i, (inputs, targets) in enumerate(data_loader):
     if not opt.no_cuda:
-        targets = targets.cuda(async=True)
+        targets = targets.cuda() 
     #inputs = Variable(torch.squeeze(inputs), volatile=True)
     inputs = Variable(inputs, volatile=True)
     targets = Variable(targets, volatile=True)

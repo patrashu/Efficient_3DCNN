@@ -1,6 +1,8 @@
 import random
 import math
 
+from soupsieve import select
+
 
 class LoopPadding(object):
 
@@ -123,7 +125,6 @@ class TemporalRandomCrop(object):
         end_index = min(begin_index + clip_duration, vid_duration)
 
         out = frame_indices[begin_index:end_index]
-
         for index in out:
             if len(out) >= clip_duration:
                 break

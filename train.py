@@ -25,6 +25,7 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
 
         if not opt.no_cuda:
             targets = targets.cuda()
+
         inputs = Variable(inputs)
         targets = Variable(targets)
         outputs = model(inputs)
@@ -51,22 +52,22 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
             'prec5': top5.val.item(),
             'lr': optimizer.param_groups[0]['lr']
         })
-        if i % 10 ==0:
-            print('Epoch: [{0}][{1}/{2}]\t lr: {lr:.5f}\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Prec@1 {top1.val:.5f} ({top1.avg:.5f})\t'
-                  'Prec@5 {top5.val:.5f} ({top5.avg:.5f})'.format(
-                      epoch,
-                      i,
-                      len(data_loader),
-                      batch_time=batch_time,
-                      data_time=data_time,
-                      loss=losses,
-                      top1=top1,
-                      top5=top5,
-                      lr=optimizer.param_groups[0]['lr']))
+
+        print('Epoch: [{0}][{1}/{2}]\t lr: {lr:.5f}\t'
+                'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
+                'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
+                'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
+                'Prec@1 {top1.val:.5f} ({top1.avg:.5f})\t'
+                'Prec@5 {top5.val:.5f} ({top5.avg:.5f})'.format(
+                    epoch,
+                    i,
+                    len(data_loader),
+                    batch_time=batch_time,
+                    data_time=data_time,
+                    loss=losses,
+                    top1=top1,
+                    top5=top5,
+                    lr=optimizer.param_groups[0]['lr']))
 
     epoch_logger.log({
         'epoch': epoch,

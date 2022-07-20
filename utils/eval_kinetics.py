@@ -177,4 +177,5 @@ def compute_video_hit_at_k(ground_truth, prediction, top_k=3, avg=False):
                                        for this_label in gt_label])
         if not avg:
             avg_hits_per_vid[i] = np.ceil(avg_hits_per_vid[i])
+            
     return float(avg_hits_per_vid.mean())

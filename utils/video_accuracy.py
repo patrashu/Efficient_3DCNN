@@ -10,10 +10,10 @@ from eval_kinetics import KINETICSclassification
 # print(ucf_classification.hit_at_k)
 
 
-kinetics_classification = KINETICSclassification('../annotation_Kinetics/kinetics.json',
-                                       '../results/val.json',
+kinetics_classification = KINETICSclassification('./hongkong/hongkong_annot.json',
+                                       './results/val.json',
                                        subset='validation',
-                                       top_k=1,
+                                       top_k=5,
                                        check_status=False)
 kinetics_classification.evaluate()
 print(kinetics_classification.hit_at_k)

@@ -29,8 +29,10 @@ def convert_csv_to_dict(csv_path, dataset_path, subset):
         else:
             database[key]['annotations'] = {}
         # Add n_frames
-        video_path = os.path.join(dataset_path, label, key)
+        sub = 'train' if subset == 'training' else 'val'
+        video_path = os.path.join(dataset_path, sub, label, key)
         cap = cv2.VideoCapture(video_path)
+        print(cap.get(7))
         database[key]['n_frames'] = int(cap.get(7)) # Returns the number of frames in the video
         cap.release()
 
@@ -41,7 +43,7 @@ def load_labels(train_csv_path):
     data = pd.read_csv(train_csv_path)
     return data['label'].unique().tolist()
 
-def convert_kinetics_csv_to_activitynet_json(train_csv_path, val_csv_path, test_csv_path, dataset_path, dst_json_path):
+def convert_kinetics_csv_to_activitynet_json(train_csv_path, val_csv_path, dataset_path, dst_json_path):
     labels = load_labels(val_csv_path)
     val_database = convert_csv_to_dict(val_csv_path, dataset_path, 'validation')
     train_database = convert_csv_to_dict(train_csv_path, dataset_path, 'training')
