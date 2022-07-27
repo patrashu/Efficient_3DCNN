@@ -115,10 +115,6 @@ python main.py --root_path <ROOT_PATH> \
 There are several augmentation techniques available. Please check spatial_transforms.py and temporal_transforms.py for the details of the augmentation methods.
 
 
-### Calculating Video Accuracy
-
-In order to calculate viceo accuracy, you should first run the models with '--test' mode in order to create 'val.json'. Then, you need to run 'video_accuracy.py' in utils folder to calculate video accuracies. 
-
 ### Calculating FLOPs
 
 In order to calculate FLOPs, run the file 'calculate_FLOP.py'. You need to fist uncomment the desired model in the file. 
