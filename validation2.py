@@ -91,25 +91,25 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
     else:
         # check resuming
         flag = False
-        f = open(cur_txt_file, 'r')
-        txt_len = len(f.readlines())
+        cf = open(cur_txt_file, 'r')
+        txt_len = len(cf.readlines())
         if txt_len-1 >= epoch:
             print('weight for duplicate class accuracy')
             with open(cur_txt_file, 'r') as f:
                 tmp = f.readlines()
             flag = True
-        f.close()
+        cf.close()
 
         # if resume with checkpoint, run this code
         if flag:
-            with open('results/resume.txt', 'w') as f:
+            with open(cur_txt_file, 'w') as f:
                 for j, line in enumerate(tmp):
                     if j < epoch-1:
                         f.write(line)
                     if j == epoch:
                         a = line.split(' ')
             print(a)
-            cur_txt_file = 'results/resume.txt'
+            # cur_txt_file = 'results/resume.txt'
             
             j = 0
             for k in total_pred:
@@ -120,9 +120,6 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
             for k  in correct_pred:
                 correct_pred[k] = total_pred[k] * float(a[j]) // 100
                 j += 1
-
-            print(total_pred)
-            print(correct_pred)
 
             f.close()
         f = open(cur_txt_file, 'a')

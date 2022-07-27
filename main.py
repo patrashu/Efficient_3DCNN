@@ -104,26 +104,26 @@ if __name__ == '__main__':
             )
 
         # visualize dataloader with transform applied
-        # i = 0
+        i = 0
         if not os.path.exists('./result_images'):
             os.makedirs('./result_images')
-        # for _ in range(1):
-        #     image, label = next(iter(train_loader))
-        #     print(image.size())
+        for _ in range(1):
+            image, label = next(iter(train_loader))
+            print(image.size())
         
-        #     for img in image:
-        #         img = img.permute(1, 0, 2, 3)
-        #         print(img.size())
+            for img in image:
+                img = img.permute(1, 0, 2, 3)
+                print(img.size())
 
-        #         for im in img:
-        #             print(im.size())
-        #             im = im.permute(1, 2, 0)
-        #             np_img = im.cpu().detach().numpy()
-        #             np_img = np_img * 255
+                for im in img:
+                    print(im.size())
+                    im = im.permute(1, 2, 0)
+                    np_img = im.cpu().detach().numpy()
+                    np_img = np_img * 255
 
-        #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
-        #             i += 1
-        #         break
+                    cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
+                    i += 1
+                break
 
         # sys.exit(0)
         train_logger = Logger(
