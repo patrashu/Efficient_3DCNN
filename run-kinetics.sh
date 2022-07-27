@@ -1,6 +1,6 @@
 ## train 
 python main.py --root_path "./" \
-	--video_path "hongkong/hongkong/train/" \
+	--video_path "hongkong/hongkong/" \
 	--annotation_path "hongkong/annot.json" \
 	--result_path "results" \
 	--dataset "kinetics" \
@@ -17,11 +17,10 @@ python main.py --root_path "./" \
 	--checkpoint 1 \
 	--n_val_samples 1 \
 	--norm_value 255 \
-
 
 ## resume train with weight
 python main.py --root_path "./" \
-	--video_path "hongkong/hongkong/train/" \
+	--video_path "hongkong/hongkong/" \
 	--annotation_path "hongkong/annot.json" \
 	--result_path "results" \
 	--dataset "kinetics" \
@@ -38,13 +37,12 @@ python main.py --root_path "./" \
 	--checkpoint 1 \
 	--n_val_samples 1 \
 	--norm_value 255 \
-	--resume_path 'results\kinetics_resnet_0.5x_RGB_16_checkpoint299_acc{82.759}.pth'
-
+	--resume_path <RESUME_PATH>
 
 ## test 
 ## if you want to test, check opt.py (no_train, no_val, test)
 python main.py --root_path "./" \
-	--video_path "hongkong/hongkong/train/" \
+	--video_path "hongkong/hongkong/" \
 	--annotation_path "hongkong/annot.json" \
 	--result_path "results" \
 	--dataset "kinetics" \
@@ -61,11 +59,7 @@ python main.py --root_path "./" \
 	--checkpoint 1 \
 	--n_val_samples 1 \
 	--norm_value 255 \
-	--resume_path 'results\kinetics_resnet_0.5x_RGB_16_checkpoint299_acc{82.759}.pth'
-	# --no_train \
-	# --no_val \
-	# --test \
-
+	--pretrain_path <PRETRAIN_PATH>
 
 # inference (build fail)
 python video_inference_ffmg.py --root_path "./" \

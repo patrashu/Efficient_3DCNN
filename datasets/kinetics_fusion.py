@@ -6,18 +6,9 @@ import math
 import functools
 import json
 import copy
-from numpy.random import randint
-import numpy as np
-import random
+import pandas as pd
 import cv2
 
-from utils import load_value_file
-
-
-SUB_PATH = {
-    'training': 'train',
-    'validation': 'validation'
-}
 
 def pil_loader(path):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
@@ -126,21 +117,23 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
         if i % 1000 == 0:
             print('dataset loading [{}/{}]'.format(i, len(video_names)))
 
-        video_path = os.path.join(root_path, SUB_PATH[subset], video_names[i])
+        video_path = os.path.join(root_path, video_names[i])
         if not os.path.exists(video_path):
             continue    
         
         n_frames = framenum[i]
         if n_frames <= 0:
             continue
-    
+
+        sensor_df = pd.read_csv(f'../Train_sensor/split_name_data/{video_names[i][:8]}.csv')
         begin_t = 1
         end_t = n_frames
         sample = {
             'video': video_path,
             'segment': [begin_t, end_t],
             'n_frames': n_frames,
-            'video_id': video_names[i][:-14].split('/')[1]
+            'video_id': video_names[i][:-14].split('/')[1],
+            'sensor_data': sensor_df
         }
         if len(annotations) != 0:
             sample['label'] = class_to_idx[annotations[i]['label']]
@@ -163,28 +156,10 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                     range(j, min(n_frames + 1, j + sample_duration)))
                 dataset.append(sample_j)
 
-    print('Number of ' + subset + ' dataset : ' + str(len(dataset)))
-
     return dataset, idx_to_class
 
 
 class Kinetics(data.Dataset):
-    """
-    Args:
-        root (string): Root directory path.
-        spatial_transform (callable, optional): A function/transform that  takes in an PIL image
-            and returns a transformed version. E.g, ``transforms.RandomCrop``
-        temporal_transform (callable, optional): A function/transform that  takes in a list of frame indices
-            and returns a transformed version
-        target_transform (callable, optional): A function/transform that takes in the
-            target and transforms it.
-        loader (callable, optional): A function to load an video given its path and frame indices.
-     Attributes:
-        classes (list): List of the class names.
-        class_to_idx (dict): Dict with items (class_name, class_index).
-        imgs (list): List of (image path, class_index) tuples
-    """
-
     def __init__(self,
                  root_path,
                  annotation_path,
@@ -195,7 +170,7 @@ class Kinetics(data.Dataset):
                  target_transform=None,
                  sample_duration=16,
                  get_loader=get_default_video_loader):
-        self.data, self.class_names = make_dataset(
+        self.video_data, self.sensor_data, self.class_names = make_dataset(
             root_path, annotation_path, subset, n_samples_for_each_video,
             sample_duration)
 
@@ -206,15 +181,10 @@ class Kinetics(data.Dataset):
         self.loader = get_loader()
 
     def __getitem__(self, index):
-        """
-        Args:
-            index (int): Index
-        Returns:
-            tuple: (image, target) where target is class_index of the target class.
-        """
-        path = self.data[index]['video']
 
-        frame_indices = self.data[index]['frame_indices']
+        path = self.video_data[index]['video']
+
+        frame_indices = self.video_data[index]['frame_indices']
         if self.temporal_transform is not None:
            frame_indices = self.temporal_transform(frame_indices)
            
@@ -225,12 +195,14 @@ class Kinetics(data.Dataset):
             clip = [self.spatial_transform(img) for img in clip]
         
         clip = torch.stack(clip, 0).permute(1, 0, 2, 3)
-        target = self.data[index]
+        target = self.video_data[index]
 
         if self.target_transform is not None:
             target = self.target_transform(target)
 
+        
+
         return clip, target
 
     def __len__(self):
-        return len(self.data)
+        return len(self.video_data)

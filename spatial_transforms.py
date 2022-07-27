@@ -465,11 +465,12 @@ class RandomResize(object):
 
 class Resize(object):
 
-    def __init__(self, size):
-        self.size = size
+    def __init__(self, size_w, size_h):
+        self.size_w = size_w
+        self.size_h = size_h
 
     def __call__(self, img):
-        ret_img = img.resize((self.size, self.size))
+        ret_img = img.resize((self.size_w, self.size_h))
 
         return ret_img
 

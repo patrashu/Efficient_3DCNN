@@ -26,9 +26,46 @@ This repository is forked by https://github.com/okankop/Efficient-3DCNNs
 ```bash
 python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
 ```
+### Custom Dataset
+- If you want to train with Custom Dataset, set your dataset like kinetics dataset format
+- First, make [csv_file](https://github.com/activitynet/ActivityNet/tree/master/Crawler/Kinetics/data) like this
+- Second, run this code, and you can get video clip like "video_name_000xxx_000xxx.mp4" format
+```
+python hongkong\download.py --input_csv <CSV_FILE> --output_dir <OUTPUT_DIR> --trim-format <TRIM_FORMAT> --tmp_dir <RAW_DATASET_DIR>
+```
+- Finally, run this code. If you set incorrect path, video total frames are not extract. So, Keep in mind check your path
+```
+python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
+```
+- To run train.py, Set your dataset directory like this
+```bash
+├── datasets
+│   ├── train
+│   │   ├── CLASS_A
+│   │   │   └── train_video1.mp4
+│   │   │   └── train_video2.mp4
+│   │   │   └── train_video3.mp4
+│   │   │    ....
+│   │   └── CLASS_B
+│   │   └── CLASS_C
+│   │   └── CLASS_D
+│   │   ....
+│   └── val
+│   │   ├── CLASS_A
+│   │   │   └── val_video1.mp4
+│   │   │   └── val_video2.mp4
+│   │   │   └── val_video3.mp4
+│   │   │    ....
+│   │   └── CLASS_B
+│   │   └── CLASS_C
+│   │   └── CLASS_D
+│   └── train.csv
+│   └── val.csv
+│   └── test.csv
+│   └── annot.json
+```
 
-
-## Running the code
+## Run Train
 
 - training details in run-kinetics.sh
 - Baseline to training python code:
@@ -51,7 +88,27 @@ python main.py --root_path <ROOT_PATH> \
 	--n_val_samples 1 \
 	# --resume_path (if you want resuming train)
 ```
-
+## Run Test
+- Enter opts.py, and Set test 'True'
+```bash
+python main.py --root_path <ROOT_PATH> \
+	--video_path <DATASET_PATH> \
+	--annotation_path <JSON_PATH> \
+	--result_path <SAVE_WEIGHT_PATH> \
+	--dataset <DATASETS> \
+	--n_classes <NUM_CLASSES> \
+	--model <TRAIN_MODELS> \
+	--width_mult 0.5 \
+	--train_crop random \
+	--learning_rate 0.1 \
+	--sample_duration 16 \
+	--downsample 2 \
+	--batch_size 64 \
+	--n_threads 16 \
+	--checkpoint 1 \
+	--n_val_samples 1 \
+	--resume_path <RESUME_PATH>
+```
 
 ### Augmentations
 

@@ -10,21 +10,18 @@ import json
 from utils import AverageMeter
 
 names = [
-    'travelling', 
-    'lifting brick', 
-    'lifting rebar', 
-    'measuring rebar', 
-    'tying rebar', 
-    'hammering', 
-    'drilling', 
-    'idle'
+    'Traveling', 
+    'Lifting Brick', 
+    'Lifting Rebar', 
+    'Measuring Rebar', 
+    'Tying Rebar', 
+    'Hammering', 
+    'Drilling', 
+    'Idle'
 ]
 
-correct_pred = {classname: 0 for classname in names}
-total_pred = {classname: 0 for classname in names} 
-
 ## output stack 후 mean => topk
-def calculate_video_results(output_buffer, video_id, test_results, class_names):
+def calculate_video_results(output_buffer, video_id, test_results, names):
     video_outputs = torch.stack(output_buffer)
     average_scores = torch.mean(video_outputs, dim=0)
     sorted_scores, locs = torch.topk(average_scores, k=8)
@@ -32,7 +29,7 @@ def calculate_video_results(output_buffer, video_id, test_results, class_names):
 
     for i in range(sorted_scores.size(0)):
         video_results.append({
-            'label': class_names[int(locs[i])],
+            'label': names[int(locs[i])],
             'score': float(sorted_scores[i])
         })
 
@@ -66,7 +63,7 @@ def test(data_loader, model, opt, class_names):
         for j in range(outputs.size(0)):
             if not (i == 0 and j == 0) and targets[j] != previous_video_id:
                 calculate_video_results(output_buffer, previous_video_id,
-                                        test_results, class_names)
+                                        test_results, names)
                 output_buffer = []
             output_buffer.append(outputs[j].data.cpu())
             previous_video_id = targets[j]
@@ -87,6 +84,7 @@ def test(data_loader, model, opt, class_names):
                   len(data_loader),
                   batch_time=batch_time,
                   data_time=data_time))
+                  
     with open(
             os.path.join(opt.result_path, '{}.json'.format(opt.test_subset)),
             'w') as f:

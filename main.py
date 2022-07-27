@@ -22,7 +22,7 @@ from target_transforms import Compose as TargetCompose
 from dataset import get_training_set, get_validation_set, get_test_set
 from utils import *
 from train import train_epoch
-from validation import val_epoch
+from validation2 import val_epoch
 import test
 
 
@@ -80,8 +80,8 @@ if __name__ == '__main__':
             # RandomHorizontalFlip(),
             #RandomRotate(),
             #RandomResize(),
+            Resize(opt.resize_w, opt.resize_h),
             crop_method,
-            Resize(opt.sample_size),
             #MultiplyValues(),
             # CenterCrop(opt.sample_size),
             #Dropout(),
@@ -103,8 +103,10 @@ if __name__ == '__main__':
             pin_memory=True,
             )
 
-        ## visualize dataloader with transform applied
+        # visualize dataloader with transform applied
         # i = 0
+        if not os.path.exists('./result_images'):
+            os.makedirs('./result_images')
         # for _ in range(1):
         #     image, label = next(iter(train_loader))
         #     print(image.size())
@@ -121,8 +123,9 @@ if __name__ == '__main__':
 
         #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
         #             i += 1
+        #         break
 
-
+        # sys.exit(0)
         train_logger = Logger(
             os.path.join(opt.result_path, 'train.log'),
             ['epoch', 'loss', 'prec1', 'prec5', 'lr'])
@@ -148,13 +151,14 @@ if __name__ == '__main__':
     if not opt.no_val:
         spatial_transform = Compose([
             # Scale(opt.sample_size),
-            Resize(opt.sample_size),
-            # CenterCrop(opt.sample_size),
+            Resize(opt.resize_w, opt.resize_h),
+            CenterCrop(opt.sample_size),
             ToTensor(opt.norm_value),
             norm_method
         ])
         #temporal_transform = LoopPadding(opt.sample_duration)
         temporal_transform = TemporalCenterCrop(opt.sample_duration, opt.downsample)
+        # temporal_transform = ValidTemporalCrop(opt.sample_duration, opt.downsample)
         target_transform = ClassLabel()
         validation_data = get_validation_set(
             opt, spatial_transform, temporal_transform, target_transform)
@@ -181,6 +185,7 @@ if __name__ == '__main__':
 
     # run train/val epoch
     print('run')
+
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
 
         if not opt.no_train:
@@ -211,53 +216,52 @@ if __name__ == '__main__':
                 }
             # save_checkpoint(state, i, is_best, opt)
 
-    ## test
-    # if opt.test:
-    #     spatial_transform = Compose([
-    #         # Scale(int(opt.sample_size / opt.scale_in_test)),
-    #         # CornerCrop(opt.sample_size, opt.crop_position_in_test),
-    #         Resize(opt.sample_size),
-    #         ToTensor(opt.norm_value), 
-    #         norm_method
-    #     ])
-    #     # temporal_transform = LoopPadding(opt.sample_duration, opt.downsample)
-    #     temporal_transform = TemporalRandomCrop(opt.sample_duration, opt.downsample)
-    #     target_transform = VideoID()
+    # test
+    if opt.test:
+        spatial_transform = Compose([
+            Resize(opt.resize_w, opt.resize_h),
+            CenterCrop(opt.sample_size),
+            ToTensor(opt.norm_value), 
+            norm_method
+        ])
+        # temporal_transform = LoopPadding(opt.sample_duration, opt.downsample)
+        temporal_transform = TemporalRandomCrop(opt.sample_duration, opt.downsample)
+        target_transform = VideoID()
 
-    #     test_data = get_test_set(opt, spatial_transform, temporal_transform,
-    #                              target_transform)
+        test_data = get_test_set(opt, spatial_transform, temporal_transform,
+                                 target_transform)
         
-    #     test_loader = torch.utils.data.DataLoader(
-    #         test_data,
-    #         batch_size=4,
-    #         shuffle=False,
-    #         num_workers=opt.n_threads,
-    #         pin_memory=True
-    #         )
+        test_loader = torch.utils.data.DataLoader(
+            test_data,
+            batch_size=4,
+            shuffle=False,
+            num_workers=opt.n_threads,
+            pin_memory=True
+            )
         
-    #     checkpoint = torch.load(opt.pretrain_path)
-    #     model.load_state_dict(checkpoint['state_dict'])
+        checkpoint = torch.load(opt.pretrain_path)
+        model.load_state_dict(checkpoint['state_dict'])
 
-    #     # i = 0
-    #     # for _ in range(1):
-    #     #     image, label = next(iter(test_loader))
-    #     #     print(image.size())
-    #     #     cv2.imwrite(f'./result_images/image{i}.jpg', image)
-    #     #     for img in image:
-    #     #         img = img.permute(1, 0, 2, 3)
-    #     #         print(img.size())
+        # i = 0
+        # for _ in range(1):
+        #     image, label = next(iter(test_loader))
+        #     print(image.size())
+        #     cv2.imwrite(f'./result_images/image{i}.jpg', image)
+        #     for img in image:
+        #         img = img.permute(1, 0, 2, 3)
+        #         print(img.size())
 
-    #     #         for im in img:
-    #     #             print(im.size())
-    #     #             im = im.permute(1, 2, 0)
-    #     #             np_img = im.cpu().detach().numpy()
-    #     #             np_img = np_img * 255
+        #         for im in img:
+        #             print(im.size())
+        #             im = im.permute(1, 2, 0)
+        #             np_img = im.cpu().detach().numpy()
+        #             np_img = np_img * 255
 
-    #     #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
-    #     #             i += 1
+        #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
+        #             i += 1
 
 
-    #     test.test(test_loader, model, opt, test_data.class_names)
+        test.test(test_loader, model, opt, test_data.class_names)
 
 
 

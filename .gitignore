@@ -107,4 +107,6 @@ venv.bak/
 # Dataset and result
 hongkong/
 results/ 
-
+result_images/
+a.ipynb
+inference.py
