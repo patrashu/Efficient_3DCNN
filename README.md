@@ -107,7 +107,7 @@ python main.py --root_path <ROOT_PATH> \
 	--n_threads 16 \
 	--checkpoint 1 \
 	--n_val_samples 1 \
-	--resume_path <RESUME_PATH>
+	--pretrain_path <PRETRAIN_PATH>
 ```
 
 ### Augmentations
