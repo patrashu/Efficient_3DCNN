@@ -29,9 +29,10 @@ def convert_csv_to_dict(csv_path, dataset_path, subset):
         else:
             database[key]['annotations'] = {}
         # Add n_frames
-        sub = 'train' if subset == 'training' else 'val'
+        sub = 'train' if subset == 'training' else 'validation'
         video_path = os.path.join(dataset_path, sub, label, key)
         cap = cv2.VideoCapture(video_path)
+        print(video_path)
         print(cap.get(7))
         database[key]['n_frames'] = int(cap.get(7)) # Returns the number of frames in the video
         cap.release()

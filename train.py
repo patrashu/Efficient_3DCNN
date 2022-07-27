@@ -8,7 +8,7 @@ from utils import *
 
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
-                epoch_logger, batch_logger):
+                epoch_logger, batch_logger, writer):
     print('train at epoch {}'.format(epoch))
 
     model.train()
@@ -35,6 +35,8 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         prec1, prec5 = calculate_accuracy(outputs.data, targets.data, topk=(1,5))
         top1.update(prec1, inputs.size(0))
         top5.update(prec5, inputs.size(0))
+        writer.add_scalar('training loss', loss, epoch)
+        writer.add_scalar('training_acc', prec1/100, epoch)
 
         optimizer.zero_grad()
         loss.backward()

@@ -121,6 +121,7 @@ class TemporalRandomCrop(object):
         clip_duration = self.size * self.downsample
 
         rand_end = max(0, vid_duration - clip_duration - 1)
+
         begin_index = random.randint(0, rand_end)
         end_index = min(begin_index + clip_duration, vid_duration)
 

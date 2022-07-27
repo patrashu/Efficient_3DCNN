@@ -6,8 +6,7 @@ import os
 
 from utils import *
 
-
-class_names = [
+CLASS_NAMES = [
     'travelling', 
     'lifting brick', 
     'lifting rebar', 
@@ -18,11 +17,18 @@ class_names = [
     'idle'
 ]
 
+CLASS_COUNT = [4, 4, 4, 5, 4, 3, 3, 2]
 
-correct_pred = {classname: 0 for classname in class_names}
-total_pred = {classname: 0 for classname in class_names}   
+correct_pred = {classname: 0 for classname in CLASS_NAMES}
+total_pred = {classname: 0 for classname in CLASS_NAMES} 
 
-def val_epoch(epoch, data_loader, model, criterion, opt, logger):
+txt_file_name = 'results/save_epoch.txt'
+cur_txt_file = txt_file_name
+
+# Save stacked validation accuracy in txt file
+def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
+    global cur_txt_file
+
     print('validation at epoch {}'.format(epoch))
 
     model.eval()
@@ -50,8 +56,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
         _, predictions = torch.max(outputs, 1)
         for label, prediction in zip(targets, predictions):
             if label == prediction:
-                correct_pred[class_names[label]] += 1
-            total_pred[class_names[label]] += 1
+                correct_pred[CLASS_NAMES[label]] += 1
+            total_pred[CLASS_NAMES[label]] += 1
 
         prec1, prec5 = calculate_accuracy(outputs.data, targets.data, topk=(1,5))
 
@@ -62,6 +68,8 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
 
         batch_time.update(time.time() - end_time)
         end_time = time.time()
+        writer.add_scalar('validation loss', loss, epoch)
+        writer.add_scalar('validation acc', prec1/100, epoch)
 
         print('Epoch: [{0}][{1}/{2}]\t'
               'Time {batch_time.val:.5f} ({batch_time.avg:.5f})\t'
@@ -78,26 +86,45 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
                   top1=top1,
                   top5=top5))
     
-    txt_file_name = 'results/save_epoch.txt'
-    
-    if not os.path.exists(txt_file_name):
-        f = open(txt_file_name, 'w')
+    # make txt file if not exist txt file
+    if not os.path.exists(cur_txt_file):
+        f = open(cur_txt_file, 'w')
         f.write('travelling lifting brick lifting rebar measuring rebar tying rebar hammering drilling idle\n')
     else:
-        # f = open(txt_file_name, 'r')
-        # if int(f.readlines()[1].split(' ')[0]) > epoch:
-        #     print('weight for duplicate class accuracy')
-        #     with open('./result/save_epoch.txt', 'r') as f:
-        #         tmp = f.readlines()
-        # f.close()
+        # check resuming
+        flag = False
+        cf = open(cur_txt_file, 'r')
+        txt_len = len(cf.readlines())
+        if txt_len-1 >= epoch:
+            print('weight for duplicate class accuracy')
+            with open(cur_txt_file, 'r') as f:
+                tmp = f.readlines()
+            flag = True
+        cf.close()
 
-        # with open('results/resume.txt', 'w') as f:
-        #     for i, line in enumerate(tmp):
-        #         if i <= epoch:
-        #             f.write(line)
+        # if resume with checkpoint, run this code
+        if flag:
+            with open(cur_txt_file, 'w') as f:
+                for j, line in enumerate(tmp):
+                    if j < epoch-1:
+                        f.write(line)
+                    if j == epoch:
+                        a = line.split(' ')
+            print(a)
+            # cur_txt_file = 'results/resume.txt'
+            
+            j = 0
+            for k in total_pred:
+                total_pred[k] = CLASS_COUNT[j] * (100)
+                j += 1
+            
+            j = 1
+            for k  in correct_pred:
+                correct_pred[k] = total_pred[k] * float(a[j]) // 100
+                j += 1
 
-        # f.close()
-        f = open('results/save_epoch.txt', 'a')
+            f.close()
+        f = open(cur_txt_file, 'a')
 
     f.write(f'{epoch}')
     for classname, correct_count in correct_pred.items():
@@ -113,5 +140,5 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger):
                 'prec1': top1.avg.item(),
                 'prec5': top5.avg.item()})
 
-
     return losses.avg.item(), top1.avg.item()
+

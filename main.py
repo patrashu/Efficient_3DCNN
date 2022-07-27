@@ -1,16 +1,15 @@
-from msilib.schema import Class
 import os
-import sys
 import json
-from tkinter import TOP
-import numpy as np
 import torch
 from torch import nn
 from torch import optim
 from torch.optim import lr_scheduler
+from tensorboardX import SummaryWriter
+
+# To visualize augmentation
+import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
-from torchvision.transforms import ToPILImage
 
 from opts import parse_opts
 from model import generate_model
@@ -22,7 +21,7 @@ from target_transforms import Compose as TargetCompose
 from dataset import get_training_set, get_validation_set, get_test_set
 from utils import *
 from train import train_epoch
-from validation2 import val_epoch
+from validation import val_epoch
 import test
 
 
@@ -67,6 +66,7 @@ if __name__ == '__main__':
         norm_method = Normalize(opt.mean, opt.std)
 
     ## train
+    writer = SummaryWriter(log_dir='runs/Efficient-3DCNN_1')
     if not opt.no_train:
         assert opt.train_crop in ['random', 'corner', 'center']
         if opt.train_crop == 'random':
@@ -104,26 +104,26 @@ if __name__ == '__main__':
             )
 
         # visualize dataloader with transform applied
-        i = 0
-        if not os.path.exists('./result_images'):
-            os.makedirs('./result_images')
-        for _ in range(1):
-            image, label = next(iter(train_loader))
-            print(image.size())
+        # i = 0
+        # if not os.path.exists('./result_images'):
+        #     os.makedirs('./result_images')
+        # for _ in range(1):
+        #     image, label = next(iter(train_loader))
+        #     print(image.size())
         
-            for img in image:
-                img = img.permute(1, 0, 2, 3)
-                print(img.size())
+        #     for img in image:
+        #         img = img.permute(1, 0, 2, 3)
+        #         print(img.size())
 
-                for im in img:
-                    print(im.size())
-                    im = im.permute(1, 2, 0)
-                    np_img = im.cpu().detach().numpy()
-                    np_img = np_img * 255
+        #         for im in img:
+        #             print(im.size())
+        #             im = im.permute(1, 2, 0)
+        #             np_img = im.cpu().detach().numpy()
+        #             np_img = np_img * 255
 
-                    cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
-                    i += 1
-                break
+        #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
+        #             i += 1
+        #         break
 
         # sys.exit(0)
         train_logger = Logger(
@@ -185,13 +185,11 @@ if __name__ == '__main__':
 
     # run train/val epoch
     print('run')
-
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
-
         if not opt.no_train:
             # adjust_learning_rate(optimizer, i, opt)
             train_epoch(i, train_loader, model, criterion, optimizer, opt,
-                        train_logger, train_batch_logger)
+                        train_logger, train_batch_logger, writer)
             state = {
                 'epoch': i,
                 'arch': opt.arch,
@@ -204,7 +202,7 @@ if __name__ == '__main__':
             
         if not opt.no_val:
             validation_loss, prec1 = val_epoch(i, val_loader, model, criterion, opt,
-                                        val_logger)
+                                        val_logger, writer)
             is_best = prec1 > best_prec1
             best_prec1 = max(prec1, best_prec1)
             state = {
@@ -215,6 +213,7 @@ if __name__ == '__main__':
                 'best_prec1': best_prec1
                 }
             # save_checkpoint(state, i, is_best, opt)
+    writer.close()
 
     # test
     if opt.test:

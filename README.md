@@ -27,17 +27,17 @@ This repository is forked by https://github.com/okankop/Efficient-3DCNNs
 python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
 ```
 ### Custom Dataset
-- If you want to train with Custom Dataset, set your dataset like kinetics dataset format
-- First, make [csv_file](https://github.com/activitynet/ActivityNet/tree/master/Crawler/Kinetics/data) like this
-- Second, run this code, and you can get video clip like "video_name_000xxx_000xxx.mp4" format
+- If you want to train with Custom Dataset, Set your dataset like Kinetics Dataset Format
+- First, make [csv_file](https://github.com/activitynet/ActivityNet/tree/master/Crawler/Kinetics/data) like this format
+- Second, Run this code. As a result, you can get video clip like "video_name_000xxx_000xxx.mp4" format
 ```
 python hongkong\download.py --input_csv <CSV_FILE> --output_dir <OUTPUT_DIR> --trim-format <TRIM_FORMAT> --tmp_dir <RAW_DATASET_DIR>
 ```
-- Finally, run this code. If you set incorrect path, video total frames are not extract. So, Keep in mind check your path
+- Finally, run this code. If you set incorrect path, video total frames are not extract. So, please check your path.
 ```
 python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
 ```
-- To run train.py, Set your dataset directory like this
+- To run train.py, Set your dataset directory.
 ```bash
 ├── datasets
 │   ├── train
@@ -66,7 +66,7 @@ python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst
 ```
 
 ## Run Train
-
+- Our Training 
 - training details in run-kinetics.sh
 - Baseline to training python code:
 ```bash
