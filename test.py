@@ -61,7 +61,7 @@ def test(data_loader, model, opt, class_names):
             outputs = F.softmax(outputs, dim=1)
 
         for j in range(outputs.size(0)):
-            if not (i == 0 and j == 0) and targets[j] != previous_video_id:
+            if (not (i == 0 and j == 0) and targets[j] != previous_video_id) or j == outputs.size(0)-1:
                 calculate_video_results(output_buffer, previous_video_id,
                                         test_results, names)
                 output_buffer = []

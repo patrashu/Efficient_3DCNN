@@ -342,7 +342,8 @@ class MultiScaleCornerCrop(object):
 class MultiScaleRandomCrop(object):
 
     def __init__(self, scales, size, interpolation=Image.BILINEAR):
-        self.scales = scales
+        # self.scales = scales
+        self.scales = 1
         self.size = size
         self.interpolation = interpolation
 
@@ -363,8 +364,8 @@ class MultiScaleRandomCrop(object):
         return img.resize((self.size, self.size), self.interpolation)
 
     def randomize_parameters(self):
-        self.scale = self.scales[random.randint(0, len(self.scales) - 1)]
-        #self.scale = 1
+        # self.scale = self.scales[random.randint(0, len(self.scales) - 1)]
+        self.scale = 1
         self.tl_x = random.random()
         self.tl_y = random.random()
 
@@ -478,16 +479,14 @@ class Resize(object):
         self.resize_const = random.uniform(0.9, 1.1)
 
 
-
-
 class Gaussian_blur(object):
 
     def __init__(self, radius=0.0):
         self.radius = radius
 
     def __call__(self, img):
-        if self.p < 0.2:
-            blurred = ndimage.gaussian_filter(img, sigma=(5, 5, 0), order=0)
+        if self.p < 0.3:
+            blurred = scipy.ndimage.gaussian_filter(img, sigma=(5, 5, 0), order=0)
             return blurred
         else:
             return img

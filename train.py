@@ -35,8 +35,6 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         prec1, prec5 = calculate_accuracy(outputs.data, targets.data, topk=(1,5))
         top1.update(prec1, inputs.size(0))
         top5.update(prec5, inputs.size(0))
-        writer.add_scalar('training loss', loss, epoch)
-        writer.add_scalar('training_acc', prec1/100, epoch)
 
         optimizer.zero_grad()
         loss.backward()
@@ -78,6 +76,9 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
         'prec5': top5.avg.item(),
         'lr': optimizer.param_groups[0]['lr']
     })
+
+    writer.add_scalar('training loss', losses.avg.item(), epoch)
+    writer.add_scalar('training_acc', top1.avg.item()/100, epoch)
 
     #if epoch % opt.checkpoint == 0:
     #    save_file_path = os.path.join(opt.result_path,

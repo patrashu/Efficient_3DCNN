@@ -77,7 +77,7 @@ if __name__ == '__main__':
             crop_method = MultiScaleCornerCrop(
                 opt.scales, opt.sample_size, crop_positions=['c'])
         spatial_transform = Compose([
-            # RandomHorizontalFlip(),
+            #RandomHorizontalFlip(),
             #RandomRotate(),
             #RandomResize(),
             Resize(opt.resize_w, opt.resize_h),
@@ -85,11 +85,11 @@ if __name__ == '__main__':
             #MultiplyValues(),
             # CenterCrop(opt.sample_size),
             #Dropout(),
-            #SaltImage(),
-            #Gaussian_blur(),
+            SaltImage(),
             #SpatialElasticDisplacement(),
-            ToTensor(opt.norm_value), 
+            ToTensor(opt.norm_value),
             norm_method
+            
         ])
         temporal_transform = TemporalRandomCrop(opt.sample_duration, opt.downsample)
         target_transform = ClassLabel()
@@ -104,6 +104,7 @@ if __name__ == '__main__':
             )
 
         # visualize dataloader with transform applied
+        # import sys
         # i = 0
         # if not os.path.exists('./result_images'):
         #     os.makedirs('./result_images')
@@ -123,9 +124,9 @@ if __name__ == '__main__':
 
         #             cv2.imwrite(f'./result_images/image{i}.jpg', np_img)
         #             i += 1
-        #         break
 
         # sys.exit(0)
+
         train_logger = Logger(
             os.path.join(opt.result_path, 'train.log'),
             ['epoch', 'loss', 'prec1', 'prec5', 'lr'])
@@ -150,9 +151,9 @@ if __name__ == '__main__':
     # val
     if not opt.no_val:
         spatial_transform = Compose([
-            # Scale(opt.sample_size),
             Resize(opt.resize_w, opt.resize_h),
             CenterCrop(opt.sample_size),
+            SaltImage(),
             ToTensor(opt.norm_value),
             norm_method
         ])
@@ -220,6 +221,7 @@ if __name__ == '__main__':
         spatial_transform = Compose([
             Resize(opt.resize_w, opt.resize_h),
             CenterCrop(opt.sample_size),
+            # SaltImage(),
             ToTensor(opt.norm_value), 
             norm_method
         ])

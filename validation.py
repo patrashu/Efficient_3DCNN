@@ -21,13 +21,14 @@ CLASS_COUNT = [4, 4, 4, 5, 4, 3, 3, 2]
 
 correct_pred = {classname: 0 for classname in CLASS_NAMES}
 total_pred = {classname: 0 for classname in CLASS_NAMES} 
+flag = True
 
 txt_file_name = 'results/save_epoch.txt'
 cur_txt_file = txt_file_name
 
 # Save stacked validation accuracy in txt file
 def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
-    global cur_txt_file
+    global cur_txt_file, flag
 
     print('validation at epoch {}'.format(epoch))
 
@@ -68,8 +69,6 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
 
         batch_time.update(time.time() - end_time)
         end_time = time.time()
-        writer.add_scalar('validation loss', loss, epoch)
-        writer.add_scalar('validation acc', prec1/100, epoch)
 
         print('Epoch: [{0}][{1}/{2}]\t'
               'Time {batch_time.val:.5f} ({batch_time.avg:.5f})\t'
@@ -85,34 +84,34 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
                   loss=losses,
                   top1=top1,
                   top5=top5))
-    
+
     # make txt file if not exist txt file
     if not os.path.exists(cur_txt_file):
         f = open(cur_txt_file, 'w')
         f.write('travelling lifting brick lifting rebar measuring rebar tying rebar hammering drilling idle\n')
+        flag = False
     else:
         # check resuming
-        flag = False
         cf = open(cur_txt_file, 'r')
         txt_len = len(cf.readlines())
-        if txt_len-1 >= epoch:
+        if txt_len-1 >= epoch-100:
             print('weight for duplicate class accuracy')
             with open(cur_txt_file, 'r') as f:
                 tmp = f.readlines()
-            flag = True
+        else:
+            flag = False
         cf.close()
 
         # if resume with checkpoint, run this code
         if flag:
             with open(cur_txt_file, 'w') as f:
                 for j, line in enumerate(tmp):
-                    if j < epoch-1:
+                    if j <= epoch-1:
                         f.write(line)
                     if j == epoch:
                         a = line.split(' ')
-            print(a)
+
             # cur_txt_file = 'results/resume.txt'
-            
             j = 0
             for k in total_pred:
                 total_pred[k] = CLASS_COUNT[j] * (100)
@@ -126,19 +125,25 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
             f.close()
         f = open(cur_txt_file, 'a')
 
-    f.write(f'{epoch}')
-    for classname, correct_count in correct_pred.items():
-        accuracy = 100 * float(correct_count) / total_pred[classname]
-        print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
-        f.write(f' {accuracy:.1f}')
+        f.write(f'{epoch}')
+        print(correct_pred)
+        print(total_pred)
 
-    f.write('\n')
-    f.close()
+        for classname, correct_count in correct_pred.items():
+            accuracy = 100 * float(correct_count) / total_pred[classname]
+            print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
+            f.write(f' {accuracy:.1f}')
+
+        f.write('\n')
+        f.close()
 
     logger.log({'epoch': epoch,
                 'loss': losses.avg.item(),
                 'prec1': top1.avg.item(),
                 'prec5': top5.avg.item()})
+                
+    writer.add_scalar('validation loss', losses.avg.item(), epoch)
+    writer.add_scalar('validation acc', top1.avg.item()/100, epoch)
 
     return losses.avg.item(), top1.avg.item()
 
