@@ -111,3 +111,4 @@ result_images/
 a.ipynb
 inference.py
 datasets/kinetics_fusion.py
+runs/
