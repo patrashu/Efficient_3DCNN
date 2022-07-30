@@ -7,7 +7,7 @@ import os
 import sys
 import json
 
-from utils import AverageMeter
+from lib.utils.utils import AverageMeter
 
 names = [
     'Traveling', 

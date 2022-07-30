@@ -24,18 +24,18 @@ This repository is forked by https://github.com/okankop/Efficient-3DCNNs
   * The CSV files (kinetics_{train, val, test}.csv) are included in the crawler.
 
 ```bash
-python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
+python lib/utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
 ```
 ### Custom Dataset
 - If you want to train with Custom Dataset, Set your dataset like Kinetics Dataset Format
 - First, make [csv_file](https://github.com/activitynet/ActivityNet/tree/master/Crawler/Kinetics/data) like this format
 - Second, Run this code. As a result, you can get video clip like "video_name_000xxx_000xxx.mp4" format
 ```
-python hongkong\download.py --input_csv <CSV_FILE> --output_dir <OUTPUT_DIR> --trim-format <TRIM_FORMAT> --tmp_dir <RAW_DATASET_DIR>
+python lib/utils/download.py --input_csv <CSV_FILE> --output_dir <OUTPUT_DIR> --trim-format <TRIM_FORMAT> --tmp_dir <RAW_DATASET_DIR>
 ```
 - Finally, run this code. If you set incorrect path, video total frames are not extract. So, please check your path.
 ```
-python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
+python lib/utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst_json_path
 ```
 - To run train.py, Set your dataset directory.
 ```bash
@@ -66,9 +66,8 @@ python utils/kinetics_json.py train_csv_path val_csv_path video_dataset_path dst
 ```
 
 ## Run Train
-- Our Training 
+- Training environment: Window11, NVIDIA A4000(16GB)*2
 - training details in run-kinetics.sh
-- Baseline to training python code:
 ```bash
 python main.py --root_path <ROOT_PATH> \
 	--video_path <DATASET_PATH> \
@@ -81,9 +80,9 @@ python main.py --root_path <ROOT_PATH> \
 	--train_crop random \
 	--learning_rate 0.1 \
 	--sample_duration 16 \
-	--downsample 2 \
-	--batch_size 64 \
-	--n_threads 16 \
+	--downsample 8 \
+	--batch_size 16 \
+	--n_threads 8 \
 	--checkpoint 1 \
 	--n_val_samples 1 \
 	# --resume_path (if you want resuming train)
@@ -102,9 +101,9 @@ python main.py --root_path <ROOT_PATH> \
 	--train_crop random \
 	--learning_rate 0.1 \
 	--sample_duration 16 \
-	--downsample 2 \
-	--batch_size 64 \
-	--n_threads 16 \
+	--downsample 8 \
+	--batch_size 16 \
+	--n_threads 8 \
 	--checkpoint 1 \
 	--n_val_samples 1 \
 	--pretrain_path <PRETRAIN_PATH>

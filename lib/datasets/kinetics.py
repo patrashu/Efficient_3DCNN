@@ -6,11 +6,18 @@ import math
 import functools
 import json
 import copy
-import random
 from numpy.random import randint
+import numpy as np
+import random
+import cv2
 
-from utils import load_value_file
+from lib.utils.utils import load_value_file
 
+
+SUB_PATH = {
+    'training': 'train',
+    'validation': 'validation'
+}
 
 def pil_loader(path):
     # open path as file to avoid ResourceWarning (https://github.com/python-pillow/Pillow/issues/835)
@@ -36,14 +43,31 @@ def get_default_image_loader():
         return pil_loader
 
 
-def video_loader(video_dir_path, frame_indices, image_loader):
+def video_loader(video_dir_path, frame_indices, sample_duration, image_loader):
+    # print(frame_indices)
+    cap = cv2.VideoCapture(video_dir_path)
     video = []
-    for i in frame_indices:
-        image_path = os.path.join(video_dir_path, 'image_{:05d}.jpg'.format(i))
-        if os.path.exists(image_path):
-            video.append(image_loader(image_path))
+    cap.set(1, frame_indices[0])
+    for _ in frame_indices:
+        ret, frame = cap.read()
+        if ret:
+            pil_frame = Image.fromarray(frame)
+            video.append(pil_frame)
         else:
-            return video
+            break
+
+    cap.release()
+    
+
+    # Loop as many times for short videos
+    for frame in video:
+        if len(video) >= sample_duration:
+            break
+        video.append(frame)
+    
+    if len(video) == 0: # give an empty clip
+        for _ in range(sample_duration):
+            video.append(Image.new('RGB', (320, 180)))
 
     return video
 
@@ -67,50 +91,56 @@ def get_class_labels(data):
     return class_labels_map
 
 
-def get_video_names_and_annotations(data, subset):
+def get_video_names_annotations_framenum(data, subset):
     video_names = []
     annotations = []
+    framenum    = []
 
-    for key, value in data['database'].items():
+    for key, value in data['database'][subset].items():
         this_subset = value['subset']
+        framenum.append(value['n_frames'])
         if this_subset == subset:
-            label = value['annotations']['label']
-            video_names.append('{}/{}'.format(label, key))
-            annotations.append(value['annotations'])
+            if subset == 'testing':
+                video_names.append('test/{}'.format(key))
+            else:
+                label = value['annotations']['label']
+                video_names.append('{}/{}'.format(label, key))
+                annotations.append(value['annotations'])
 
-    return video_names, annotations
+    return video_names, annotations, framenum
 
 
 def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                  sample_duration):
+    
     data = load_annotation_data(annotation_path)
-    video_names, annotations = get_video_names_and_annotations(data, subset)
+    video_names, annotations, framenum = get_video_names_annotations_framenum(data, subset)
     class_to_idx = get_class_labels(data)
     idx_to_class = {}
     for name, label in class_to_idx.items():
         idx_to_class[label] = name
 
+    # print(video_names)
     dataset = []
     for i in range(len(video_names)):
         if i % 1000 == 0:
             print('dataset loading [{}/{}]'.format(i, len(video_names)))
 
-        video_path = os.path.join(root_path, video_names[i])
+        video_path = os.path.join(root_path, SUB_PATH[subset], video_names[i])
         if not os.path.exists(video_path):
-            continue
-
-        n_frames_file_path = os.path.join(video_path, 'n_frames')
-        n_frames = int(load_value_file(n_frames_file_path))
+            continue    
+        
+        n_frames = framenum[i]
         if n_frames <= 0:
             continue
-
+    
         begin_t = 1
         end_t = n_frames
         sample = {
             'video': video_path,
             'segment': [begin_t, end_t],
             'n_frames': n_frames,
-            'video_id': video_names[i].split('/')[1]
+            'video_id': video_names[i][:-14].split('/')[1]
         }
         if len(annotations) != 0:
             sample['label'] = class_to_idx[annotations[i]['label']]
@@ -133,10 +163,12 @@ def make_dataset(root_path, annotation_path, subset, n_samples_for_each_video,
                     range(j, min(n_frames + 1, j + sample_duration)))
                 dataset.append(sample_j)
 
+    print('Number of ' + subset + ' dataset : ' + str(len(dataset)))
+
     return dataset, idx_to_class
 
 
-class UCF101(data.Dataset):
+class Kinetics(data.Dataset):
     """
     Args:
         root (string): Root directory path.
@@ -170,6 +202,7 @@ class UCF101(data.Dataset):
         self.spatial_transform = spatial_transform
         self.temporal_transform = temporal_transform
         self.target_transform = target_transform
+        self.sample_duration = sample_duration
         self.loader = get_loader()
 
     def __getitem__(self, index):
@@ -183,14 +216,17 @@ class UCF101(data.Dataset):
 
         frame_indices = self.data[index]['frame_indices']
         if self.temporal_transform is not None:
-            frame_indices = self.temporal_transform(frame_indices)
-        clip = self.loader(path, frame_indices)
+           frame_indices = self.temporal_transform(frame_indices)
+           
+        clip = self.loader(path, frame_indices, self.sample_duration)
+        
         if self.spatial_transform is not None:
             self.spatial_transform.randomize_parameters()
             clip = [self.spatial_transform(img) for img in clip]
+        
         clip = torch.stack(clip, 0).permute(1, 0, 2, 3)
-
         target = self.data[index]
+
         if self.target_transform is not None:
             target = self.target_transform(target)
 

@@ -15,7 +15,7 @@ from matplotlib.animation import FFMpegWriter, writers
 from celluloid import Camera
 
 from opts import parse_opts
-from model import generate_model
+from lib.models.select_model import generate_model
 from mean import get_mean, get_std
 from spatial_transforms import *
 

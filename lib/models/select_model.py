@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from models import c3d, squeezenet, mobilenet, shufflenet, mobilenetv2, shufflenetv2, resnext, resnet
+from . import c3d, squeezenet, mobilenet, shufflenet, mobilenetv2, shufflenetv2, resnext, resnet
 
 
 def generate_model(opt):
@@ -72,7 +72,7 @@ def generate_model(opt):
                 sample_duration=opt.sample_duration)
     elif opt.model == 'resnet':
         assert opt.model_depth in [10, 18, 34, 50, 101, 152, 200]
-        from models.resnet import get_fine_tuning_parameters
+        from lib.models.resnet import get_fine_tuning_parameters
         if opt.model_depth == 10:
             model = resnet.resnet10(
                 num_classes=opt.n_classes,
