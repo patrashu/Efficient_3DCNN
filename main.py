@@ -153,7 +153,7 @@ if __name__ == '__main__':
     print('run')
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
         if not opt.no_train:
-            adjust_learning_rate(optimizer, i, opt)
+            # adjust_learning_rate(optimizer, i, opt)
             train_epoch(i, train_loader, model, criterion, optimizer, opt,
                         train_logger, train_batch_logger, writer)
             state = {
