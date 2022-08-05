@@ -20,7 +20,6 @@ python main.py --root_path <ROOT_PATH> \
 	--video_path <DATASET_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \
-	--dataset <DATASETS> \
 ```
 ## Run Test
 - Enter opts.py, and Set test 'True'
@@ -29,7 +28,6 @@ python main.py --root_path <ROOT_PATH> \
 	--video_path <DATASET_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \
-	--dataset <DATASETS> \
 	--pretrain_path <PRETRAIN_PATH>
 ```
 
