@@ -15,12 +15,12 @@ def parse_opts():
     parser.add_argument('--n_finetune_classes', default=8, type=int, help='Number of classes for fine-tuning. n_classes is set to the number when pretraining.')
     
     # spatial and temporal transform
-    parser.add_argument('--sample_size', default=112, type=int, help='Height and width of inputs')
+    parser.add_argument('--sample_size', default=224, type=int, help='Height and width of inputs')
     parser.add_argument('--resize_w', default=320, type=int, help='Height and width of inputs')
     parser.add_argument('--resize_h', default=240, type=int, help='Height and width of inputs')
     parser.add_argument('--sample_duration', default=16, type=int, help='Temporal duration of inputs')
-    parser.add_argument('--downsample', default=1, type=int, help='How many frames skip in temporal duration, if 2=> idx = (0, 2, .....)')
-    parser.add_argument('--train_crop', default='corner', type=str, help='Spatial cropping method in training. random is uniform. corner is selection from 4 corners and 1 center.  (random | corner | center)')
+    parser.add_argument('--downsample', default=8, type=int, help='How many frames skip in temporal duration, if 2=> idx = (0, 2, .....)')
+    parser.add_argument('--train_crop', default='random', type=str, help='Spatial cropping method in training. random is uniform. corner is selection from 4 corners and 1 center.  (random | corner | center)')
 
     # optimizer and lr
     parser.add_argument('--optimizer', default='sgd', type=str, help='Currently only support SGD')
@@ -32,14 +32,14 @@ def parse_opts():
     parser.add_argument('--lr_steps', default=[40, 55, 65, 70, 200, 250], type=float, nargs="+", metavar='LRSteps', help='epochs to decay learning rate by 10')
 
     # training 
-    parser.add_argument('--batch_size', default=128, type=int, help='Batch Size')
-    parser.add_argument('--n_threads', default=16, type=int, help='Number of threads for multi-thread loading')
-    parser.add_argument('--n_epochs', default=250, type=int, help='Number of total epochs to run')
+    parser.add_argument('--batch_size', default=16, type=int, help='Batch Size')
+    parser.add_argument('--n_threads', default=8, type=int, help='Number of threads for multi-thread loading')
+    parser.add_argument('--n_epochs', default=300, type=int, help='Number of total epochs to run')
     parser.add_argument('--begin_epoch', default=1, type=int, help='Training begins at this epoch. Previous trained model indicated by resume_path is loaded.')
-    parser.add_argument('--n_val_samples', default=3, type=int, help='Number of validation samples for each activity')
+    parser.add_argument('--n_val_samples', default=1, type=int, help='Number of validation samples for each activity')
     parser.add_argument('--resume_path', default='', type=str, help='Save data (.pth) of previous training')
     parser.add_argument('--pretrain_path', default='', type=str, help='Pretrained model (.pth)')
-    parser.add_argument('--norm_value', default=1, type=int, help='If 1, range of inputs is [0-255]. If 255, range of inputs is [0-1].')
+    parser.add_argument('--norm_value', default=255, type=int, help='If 1, range of inputs is [0-255]. If 255, range of inputs is [0-1].')
     parser.add_argument('--model', default='resnet', type=str, help='(resnet | preresnet | wideresnet | resnext | densenet | ')
     parser.add_argument('--model_depth', default=50, type=int, help='Depth of resnet (10 | 18 | 34 | 50 | 101)')
     parser.add_argument('--resnet_shortcut', default='B', type=str, help='Shortcut type of resnet (A | B)')
@@ -51,7 +51,7 @@ def parse_opts():
     parser.set_defaults(no_softmax_in_test=False)
     parser.add_argument('--no_cuda', action='store_true', help='If true, cuda is not used.')
     parser.set_defaults(no_cuda=False)
-    parser.add_argument('--checkpoint', default=10, type=int, help='Trained model is saved at every this epochs.')
+    parser.add_argument('--checkpoint', default=1, type=int, help='Trained model is saved at every this epochs.')
     parser.add_argument('--no_hflip', action='store_true', help='If true holizontal flipping is not performed.')
     parser.set_defaults(no_hflip=False)
     parser.add_argument('--version', default=1.1, type=float, help='Version of the model')
