@@ -15,7 +15,7 @@ def parse_opts():
     parser.add_argument('--n_finetune_classes', default=8, type=int, help='Number of classes for fine-tuning. n_classes is set to the number when pretraining.')
     
     # spatial and temporal transform
-    parser.add_argument('--sample_size', default=224, type=int, help='Height and width of inputs')
+    parser.add_argument('--sample_size', default=240, type=int, help='Height and width of inputs')
     parser.add_argument('--resize_w', default=320, type=int, help='Height and width of inputs')
     parser.add_argument('--resize_h', default=240, type=int, help='Height and width of inputs')
     parser.add_argument('--sample_duration', default=16, type=int, help='Temporal duration of inputs')
@@ -29,7 +29,7 @@ def parse_opts():
     parser.add_argument('--mean_dataset', default='kinetics', type=str, help='dataset for mean values of mean subtraction (activitynet | kinetics)')
     parser.add_argument('--lr_patience', default=10, type=int, help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')
     parser.add_argument('--learning_rate', default=0.04, type=float, help='Initial learning rate (divided by 10 while training by lr scheduler)')
-    parser.add_argument('--lr_steps', default=[40, 55, 65, 70, 200, 250], type=float, nargs="+", metavar='LRSteps', help='epochs to decay learning rate by 10')
+    # parser.add_argument('--lr_steps', default=[40, 55, 65, 70, 200, 250], type=float, nargs="+", metavar='LRSteps', help='epochs to decay learning rate by 10')
 
     # training 
     parser.add_argument('--batch_size', default=16, type=int, help='Batch Size')
@@ -66,9 +66,9 @@ def parse_opts():
     parser.add_argument('--test', action='store_true', help='If true, test is performed.')
     
 
-    parser.set_defaults(no_train=False)
-    parser.set_defaults(no_val=False)
-    parser.set_defaults(test=False)
+    parser.set_defaults(no_train=True)
+    parser.set_defaults(no_val=True)
+    parser.set_defaults(test=True)
    
     
 

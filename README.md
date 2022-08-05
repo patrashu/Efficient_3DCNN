@@ -21,20 +21,6 @@ python main.py --root_path <ROOT_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \
 	--dataset <DATASETS> \
-	# --n_classes <NUM_CLASSES> \
-	# --sample_size 224 \
-	# --model "resnet"
-	# --width_mult 0.5 \
-	# --train_crop random \
-	# --sample_duration 16 \
-	# --downsample 8 \
-	# --batch_size 16 \
-	# --n_epochs 300 \
-	# --n_thread 8 \
-	# --checkpoint 1 \
-	# --n_val_samples 1 \
-	# --norm_value 255 \
-	--resume_path (if you want resuming train)
 ```
 ## Run Test
 - Enter opts.py, and Set test 'True'
@@ -44,17 +30,6 @@ python main.py --root_path <ROOT_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \
 	--dataset <DATASETS> \
-	# --n_classes <NUM_CLASSES> \
-	# --model <TRAIN_MODELS> \
-	# --width_mult 0.5 \
-	# --train_crop random \
-	# --learning_rate 0.04 \
-	# --sample_duration 16 \
-	# --downsample 8 \
-	# --batch_size 16 \
-	# --n_threads 8 \
-	# --checkpoint 1 \
-	# --n_val_samples 1 \
 	--pretrain_path <PRETRAIN_PATH>
 ```
 
