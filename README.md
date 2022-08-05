@@ -6,7 +6,7 @@ This repository is forked by https://github.com/okankop/Efficient-3DCNNs
 
 ## Requirements
 
-* Pytorch 1.08
+* [Pytorch 1.12 + CUDA 11.3](https://pytorch.org/get-started/locally/)
 * OpenCV
 * FFmpeg, FFprobe
 * Python 3.8
