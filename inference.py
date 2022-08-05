@@ -50,6 +50,7 @@ def test(data_loader, model, opt, class_names):
     test_results = {'results': {}}
 
     for i, (inputs, targets) in enumerate(data_loader):
+        print(targets)
         data_time.update(time.time() - end_time)
 
         with torch.no_grad():

@@ -18,14 +18,11 @@ CLASS_NAMES = [
     'idle'
 ]
 
-CLASS_COUNT = [4, 4, 4, 5, 4, 3, 3, 5]
+# CLASS_COUNT = [4, 4, 4, 5, 4, 3, 3, 5]
+# flag = True
 
-correct_pred = {classname: 0 for classname in CLASS_NAMES}
-total_pred = {classname: 0 for classname in CLASS_NAMES} 
-flag = True
-
-txt_file_name = 'results/save_epoch.txt'
-cur_txt_file = txt_file_name
+# txt_file_name = 'results/save_epoch.txt'
+# cur_txt_file = txt_file_name
 
 
 def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
@@ -104,7 +101,9 @@ def train_epoch(epoch, data_loader, model, criterion, optimizer, opt,
 
 
 def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
-    global cur_txt_file, flag
+    correct_pred = {classname: 0 for classname in CLASS_NAMES}
+    total_pred = {classname: 0 for classname in CLASS_NAMES} 
+    # global cur_txt_file, flag
 
     print('validation at epoch {}'.format(epoch))
 
@@ -161,59 +160,11 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
                   top1=top1,
                   top5=top5))
 
-    # make txt file if not exist txt file
-    if not os.path.exists(cur_txt_file):
-        f = open(cur_txt_file, 'w')
-        f.write('travelling lifting brick lifting rebar measuring rebar tying rebar hammering drilling idle\n')
-        flag = False
-    else:
-        # check resuming
-        cf = open(cur_txt_file, 'r')
-        txt_len = len(cf.readlines())
-        if txt_len-1 >= epoch-100:
-            print('weight for duplicate class accuracy')
-            with open(cur_txt_file, 'r') as f:
-                tmp = f.readlines()
-        else:
-            flag = False
-        cf.close()
-
-        # if resume with checkpoint, run this code
-        if flag:
-            with open(cur_txt_file, 'w') as f:
-                for j, line in enumerate(tmp):
-                    if j <= epoch-1:
-                        f.write(line)
-                    if j == epoch:
-                        a = line.split(' ')
-
-            # cur_txt_file = 'results/resume.txt'
-            j = 0
-            for k in total_pred:
-                total_pred[k] = CLASS_COUNT[j] * (100)
-                j += 1
-            
-            j = 1
-            for k  in correct_pred:
-                correct_pred[k] = total_pred[k] * float(a[j]) // 100
-                j += 1
-
-            f.close()
-        f = open(cur_txt_file, 'a')
-
-        f.write(f'{epoch}')
-        print(correct_pred)
-        print(total_pred)
-
         for classname, correct_count in correct_pred.items():
-            accuracy = 100 * float(correct_count) / total_pred[classname]
-            print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
-            f.write(f' {accuracy:.1f}')
+            # acc = correct_count / total_pred[classname]
+            print(f'Accuracy for class: {classname:5s} is {correct_count:.1f} %')
 
-        f.write('\n')
-        f.close()
-
-    logger.log({'epoch': epoch,
+        logger.log({'epoch': epoch,
                 'loss': losses.avg.item(),
                 'prec1': top1.avg.item(),
                 'prec5': top5.avg.item()})
@@ -222,3 +173,57 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
     writer.add_scalar('validation acc', top1.avg.item()/100, epoch)
 
     return losses.avg.item(), top1.avg.item()
+
+    # # make txt file if not exist txt file
+    # if not os.path.exists(cur_txt_file):
+    #     f = open(cur_txt_file, 'w')
+    #     f.write('travelling lifting brick lifting rebar measuring rebar tying rebar hammering drilling idle\n')
+    #     flag = False
+    # else:
+    #     # check resuming
+    #     cf = open(cur_txt_file, 'r')
+    #     txt_len = len(cf.readlines())
+    #     if txt_len-1 >= epoch-100:
+    #         print('weight for duplicate class accuracy')
+    #         with open(cur_txt_file, 'r') as f:
+    #             tmp = f.readlines()
+    #     else:
+    #         flag = False
+    #     cf.close()
+
+    #     # if resume with checkpoint, run this code
+    #     if flag:
+    #         with open(cur_txt_file, 'w') as f:
+    #             for j, line in enumerate(tmp):
+    #                 if j <= epoch-1:
+    #                     f.write(line)
+    #                 if j == epoch:
+    #                     a = line.split(' ')
+
+    #         # cur_txt_file = 'results/resume.txt'
+    #         j = 0
+    #         for k in total_pred:
+    #             total_pred[k] = CLASS_COUNT[j] * (100)
+    #             j += 1
+            
+    #         j = 1
+    #         for k  in correct_pred:
+    #             correct_pred[k] = total_pred[k] * float(a[j]) // 100
+    #             j += 1
+
+    #         f.close()
+    #     f = open(cur_txt_file, 'a')
+
+    #     f.write(f'{epoch}')
+    #     print(correct_pred)
+    #     print(total_pred)
+
+        # for classname, correct_count in correct_pred.items():
+        #     accuracy = 100 * float(correct_count) / total_pred[classname]
+        #     print(f'Accuracy for class: {classname:5s} is {accuracy:.1f} %')
+        #     f.write(f' {accuracy:.1f}')
+
+        # f.write('\n')
+        # f.close()
+
+    

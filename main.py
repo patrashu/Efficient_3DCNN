@@ -38,7 +38,7 @@ if __name__ == '__main__':
 
     norm_method = Normalize(opt.mean, opt.std)
     ## train
-    writer = SummaryWriter(log_dir='runs/Efficient-3DCNN_2')
+    writer = SummaryWriter(log_dir='runs/lr_scheduling')
 
     if not opt.no_train:
         assert opt.train_crop in ['random', 'corner', 'center']
@@ -56,7 +56,6 @@ if __name__ == '__main__':
             SaltImage(),
             ToTensor(opt.norm_value),
             norm_method
-            
         ])
         temporal_transform = TemporalRandomCrop(opt.sample_duration, opt.downsample)
         target_transform = ClassLabel()
@@ -154,7 +153,7 @@ if __name__ == '__main__':
     print('run')
     for i in range(opt.begin_epoch, opt.n_epochs + 1):
         if not opt.no_train:
-            # adjust_learning_rate(optimizer, i, opt)
+            adjust_learning_rate(optimizer, i, opt)
             train_epoch(i, train_loader, model, criterion, optimizer, opt,
                         train_logger, train_batch_logger, writer)
             state = {

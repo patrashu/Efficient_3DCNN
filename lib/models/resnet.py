@@ -193,9 +193,11 @@ class ResNet(nn.Module):
 
 def get_fine_tuning_parameters(model, ft_portion):
     if ft_portion == "complete":
+        print('complete')
         return model.parameters()
 
     elif ft_portion == "last_layer":
+        print('last_layer')
         ft_module_names = []
         ft_module_names.append('fc')
 
@@ -207,6 +209,7 @@ def get_fine_tuning_parameters(model, ft_portion):
                     break
             else:
                 parameters.append({'params': v, 'lr': 0.0})
+        print()
         return parameters
 
     else:

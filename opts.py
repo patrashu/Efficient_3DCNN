@@ -29,7 +29,7 @@ def parse_opts():
     parser.add_argument('--mean_dataset', default='kinetics', type=str, help='dataset for mean values of mean subtraction (activitynet | kinetics)')
     parser.add_argument('--lr_patience', default=10, type=int, help='Patience of LR scheduler. See documentation of ReduceLROnPlateau.')
     parser.add_argument('--learning_rate', default=0.04, type=float, help='Initial learning rate (divided by 10 while training by lr scheduler)')
-    # parser.add_argument('--lr_steps', default=[40, 55, 65, 70, 200, 250], type=float, nargs="+", metavar='LRSteps', help='epochs to decay learning rate by 10')
+    parser.add_argument('--lr_steps', default=[40, 55, 65, 70, 200, 250], type=float, nargs="+", metavar='LRSteps', help='epochs to decay learning rate by 10')
 
     # training 
     parser.add_argument('--batch_size', default=128, type=int, help='Batch Size')
@@ -65,6 +65,7 @@ def parse_opts():
     parser.add_argument('--no_val', action='store_true', help='If true, validation is not performed.')
     parser.add_argument('--test', action='store_true', help='If true, test is performed.')
     
+
     parser.set_defaults(no_train=False)
     parser.set_defaults(no_val=False)
     parser.set_defaults(test=False)

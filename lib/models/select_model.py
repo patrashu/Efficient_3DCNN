@@ -128,6 +128,10 @@ def generate_model(opt):
         if opt.pretrain_path:
             print('loading pretrained model {}'.format(opt.pretrain_path))
             pretrain = torch.load(opt.pretrain_path, map_location=torch.device('cpu'))
+            print(pretrain.keys())
+            print(pretrain['arch'])
+            print(opt.arch)
+            pretrain['arch'] = 'resnet'
             assert opt.arch == pretrain['arch']
             model.load_state_dict(pretrain['state_dict'])
 
@@ -171,6 +175,7 @@ def generate_model(opt):
                 model.module.fc = nn.Linear(model.module.fc.in_features, opt.n_finetune_classes)
 
             parameters = get_fine_tuning_parameters(model, opt.ft_begin_index)
+            print(parameters)
             return model, parameters
 
     return model, model.parameters()
