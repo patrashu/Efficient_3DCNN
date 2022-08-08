@@ -20,8 +20,6 @@ names = [
     'Idle'
 ]
 
-correct_pred = {classname: 0 for classname in names}
-total_pred = {classname: 0 for classname in names} 
 
 ## output stack 후 mean => topk
 def calculate_video_results(output_buffer, video_id, test_results, names):
@@ -35,9 +33,6 @@ def calculate_video_results(output_buffer, video_id, test_results, names):
             'label': names[int(locs[i])],
             'score': float(sorted_scores[i])
         })
-
-    correct_pred[names[label]] += 1
-    total_pred[names[label]] += 1
 
     test_results['results'][video_id] = video_results
 
@@ -67,12 +62,15 @@ def test(data_loader, model, opt, class_names):
             outputs = F.softmax(outputs, dim=1)
 
         for j in range(outputs.size(0)):
-            if (not (i == 0 and j == 0) and targets[j] != previous_video_id) or j == outputs.size(0)-1:
+            if (not (i == 0 and j == 0) and targets[j] != previous_video_id) or j == outputs.size(0):
                 calculate_video_results(output_buffer, previous_video_id,
                                         test_results, names)
                 output_buffer = []
             output_buffer.append(outputs[j].data.cpu())
             previous_video_id = targets[j]
+
+        calculate_video_results(output_buffer, previous_video_id,
+                                test_results, names)
 
         if (i % 100) == 0:
             with open(

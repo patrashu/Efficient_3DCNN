@@ -61,9 +61,9 @@ python main.py \
 	# --checkpoint 1 \
 	# --n_val_samples 1 \
 	# --norm_value 255 \
-	
 
-# inference (build fail)
+
+## inference with parameter(second)
 python video_inference_ffmg.py \
 	--video_path "hongkong/hongkong/train/" \
 	--annotation_path "hongkong/annot.json" \

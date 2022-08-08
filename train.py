@@ -160,14 +160,14 @@ def val_epoch(epoch, data_loader, model, criterion, opt, logger, writer):
                   top1=top1,
                   top5=top5))
 
-        for classname, correct_count in correct_pred.items():
-            # acc = correct_count / total_pred[classname]
-            print(f'Accuracy for class: {classname:5s} is {correct_count:.1f} %')
-
         logger.log({'epoch': epoch,
                 'loss': losses.avg.item(),
                 'prec1': top1.avg.item(),
                 'prec5': top5.avg.item()})
+
+    for classname, correct_count in correct_pred.items():
+        # acc = correct_count / total_pred[classname]
+        print(f'Accuracy for class: {classname:5s} is {correct_count:.1f} %')
                 
     writer.add_scalar('validation loss', losses.avg.item(), epoch)
     writer.add_scalar('validation acc', top1.avg.item()/100, epoch)

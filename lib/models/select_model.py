@@ -128,9 +128,9 @@ def generate_model(opt):
         if opt.pretrain_path:
             print('loading pretrained model {}'.format(opt.pretrain_path))
             pretrain = torch.load(opt.pretrain_path, map_location=torch.device('cpu'))
-            print(pretrain.keys())
-            print(pretrain['arch'])
-            print(opt.arch)
+            # print(pretrain.keys())
+            # print(pretrain['arch'])
+            # print(opt.arch)
             pretrain['arch'] = 'resnet'
             assert opt.arch == pretrain['arch']
             model.load_state_dict(pretrain['state_dict'])

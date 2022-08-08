@@ -25,7 +25,8 @@ if __name__ == '__main__':
     opt.std = get_std(opt.norm_value)
     opt.store_name = '_'.join([opt.dataset, opt.model, str(opt.width_mult) + 'x',
                                'downsample_' + str(opt.sample_duration)])
-
+    print(opt)
+    
     with open(os.path.join(opt.result_path, 'opts.json'), 'w') as opt_file:
         json.dump(vars(opt), opt_file)
 
@@ -69,6 +70,7 @@ if __name__ == '__main__':
             pin_memory=True,
             )
 
+        
         # visualize dataloader with transform applied
         # import sys
         # import numpy as np
@@ -194,16 +196,17 @@ if __name__ == '__main__':
         temporal_transform = TemporalRandomCrop(opt.sample_duration, opt.downsample)
         target_transform = VideoID()
 
-        test_data = get_test_set(opt, spatial_transform, temporal_transform,
-                                 target_transform)
+        test_data = get_test_set(
+            opt, spatial_transform, temporal_transform, target_transform
+        )
         
         test_loader = torch.utils.data.DataLoader(
             test_data,
-            batch_size=4,
+            batch_size=8,
             shuffle=False,
             num_workers=opt.n_threads,
             pin_memory=True
-            )
+        )
         
         checkpoint = torch.load(opt.pretrain_path)
         model.load_state_dict(checkpoint['state_dict'])

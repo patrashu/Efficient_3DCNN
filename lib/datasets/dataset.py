@@ -42,13 +42,14 @@ def get_test_set(opt, spatial_transform, temporal_transform, target_transform):
     assert opt.test_subset in ['val', 'test']
 
     if opt.test_subset == 'val':
-        subset = 'training'
+        subset = 'validation'
     if opt.dataset == 'kinetics':
         test_data = Kinetics(
             opt.video_path,
             opt.annotation_path,
             subset,
             0,
+            # opt.n_val_samples,
             spatial_transform,
             temporal_transform,
             target_transform,

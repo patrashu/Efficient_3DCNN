@@ -30,6 +30,16 @@ python main.py \
 	--result_path <SAVE_WEIGHT_PATH> \
 	--pretrain_path <PRETRAIN_PATH>
 ```
+## Inference
+- 
+```
+python video_inference.py \
+	--video_path <DATASET_PATH> \
+	--annotation_path <JSON_PATH> \
+	--result_path <RESULT_PATH> \
+	--pretrain_path <PRETRAIN_PATH>
+```
+
 
 ### Augmentations
 

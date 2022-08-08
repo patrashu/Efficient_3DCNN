@@ -20,6 +20,7 @@ def parse_opts():
     parser.add_argument('--sample_duration', default=16, type=int, help='Temporal duration of inputs')
     parser.add_argument('--downsample', default=8, type=int, help='How many frames skip in temporal duration, if 2=> idx = (0, 2, .....)')
     parser.add_argument('--train_crop', default='random', type=str, help='Spatial cropping method in training. random is uniform. corner is selection from 4 corners and 1 center.  (random | corner | center)')
+    parser.add_argument('--temporal_clip', default=0.5, type=float, help='temporal clip with second')
 
     # optimizer and lr
     parser.add_argument('--optimizer', default='sgd', type=str, help='Currently only support SGD')
@@ -64,10 +65,10 @@ def parse_opts():
     parser.add_argument('--no_val', action='store_true', help='If true, validation is not performed.')
     parser.add_argument('--test', action='store_true', help='If true, test is performed.')
     
-
-    parser.set_defaults(no_train=True)
-    parser.set_defaults(no_val=True)
-    parser.set_defaults(test=True)
+    flag = True
+    parser.set_defaults(no_train=flag)
+    parser.set_defaults(no_val=flag)
+    parser.set_defaults(test=flag)
    
     
 

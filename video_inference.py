@@ -1,4 +1,5 @@
 from random import sample
+from re import L
 import cv2
 import torch
 import os
@@ -51,7 +52,10 @@ class Video(animation.FuncAnimation):
         self.cnt = 0
         self.y_label = [v for k, v in class_names.items()]
         self.x_label = [0 for _ in range(len(class_names))]
-        self.temporal_clip = temporal_clip
+        self.temporal_clip = opt.temporal_clip * 30
+        self.split = int(self.temporal_clip // 2)
+        self.odd = True if self.split%2 != 0 else False
+        self.cnt_flag = True
 
     def start(self):
         ret, self.frame = self.cap.read()
@@ -59,7 +63,6 @@ class Video(animation.FuncAnimation):
             self.im0 = self.ax0.imshow(
                 cv2.cvtColor(self.frame, cv2.COLOR_BGR2RGB), aspect='auto'
             )
-
             self.im1 = self.ax1.barh(self.y_label, self.x_label)
     
     def updateFrame(self, k):
@@ -81,7 +84,7 @@ class Video(animation.FuncAnimation):
 
             pil_frame = Image.fromarray(self.frame)
             self.queue.append(pil_frame)
-        
+
             if len(self.queue) == self.temporal_clip:
                 buffer = [transform(image) for image in self.queue]
 
@@ -97,9 +100,17 @@ class Video(animation.FuncAnimation):
                 for i, num in enumerate(locs[0]):
                     self.x_label[num] = float(sorted_scores[0][i])
                 
-            if len(self.queue) > sample_duration-1:
-                self.queue.pop(0)
-                print('Delete', len(self.queue))
+            if len(self.queue) > self.temporal_clip-1:
+                if self.odd and self.cnt_flag:
+                    for _ in range(self.split+1):
+                        self.queue.pop(0)
+                        print('Delete', len(self.queue))
+                    self.cnt_flag=False
+                else:
+                    for _ in range(self.split):
+                        self.queue.pop(0)
+                        print('Delete', len(self.queue))
+                    self.cnt_flag=True
                 label = f'{label} ({score})'
 
             cv2.putText(
@@ -115,7 +126,7 @@ class Video(animation.FuncAnimation):
             for p in self.ax1.patches:
                 x, y, w, h = p.get_bbox().bounds
                 self.ax1.text(w*1.07, y+h/2, "%.1f %%"%(w*100), va='center', fontsize=7)
-        
+
     
     def close(self):
         if self.cap.isOpened():
@@ -131,20 +142,21 @@ if __name__ == '__main__':
     opt.std = get_std(opt.norm_value)
     opt.store_name = '_'.join([opt.dataset, opt.model, str(opt.width_mult) + 'x',
                                'downsample_' + str(opt.sample_duration)])
+    
 
     base_path = './hongkong/hongkong/'
     video_path = "validation/drilling/IMG_0120_000063_000071.mp4"
-    model_path = 'results\\kinetics_resnet_0.5x_ds8_sd16_checkpoint174_acc.pth'
+    model_path = 'results\\kinetics_resnet_0.5x_downsample_16_checkpoint179_acc.pth'
         
     transform = Compose([
-        Resize(opt.resize_w, opt.resize_h),
+        Resize(opt.resize_h, opt.resize_h),
         CenterCrop(opt.sample_size),
         ToTensor(opt.norm_value),
         # Normalize(opt.mean, opt.std),        
     ])
 
     # temporal terms in second
-    temporal_clip = 1
+    # temporal_clip = opt.temporal_clip
 
     class_names = {
         0: 'travelling', 
