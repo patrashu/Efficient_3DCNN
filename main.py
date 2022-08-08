@@ -26,7 +26,9 @@ if __name__ == '__main__':
     opt.store_name = '_'.join([opt.dataset, opt.model, str(opt.width_mult) + 'x',
                                'downsample_' + str(opt.sample_duration)])
     print(opt)
-    
+    if not os.path.isdir(opt.result_path):
+        os.makedirs(opt.result_path)
+
     with open(os.path.join(opt.result_path, 'opts.json'), 'w') as opt_file:
         json.dump(vars(opt), opt_file)
 
