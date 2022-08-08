@@ -16,7 +16,7 @@ This repository is forked by https://github.com/okankop/Efficient-3DCNNs
 - Training environment: Window11, NVIDIA A4000(16GB)*2
 - training details in run-kinetics.sh
 ```bash
-python main.py --root_path <ROOT_PATH> \
+python main.py \
 	--video_path <DATASET_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \
@@ -24,7 +24,7 @@ python main.py --root_path <ROOT_PATH> \
 ## Run Test
 - Enter opts.py, and Set test 'True'
 ```bash
-python main.py --root_path <ROOT_PATH> \
+python main.py \
 	--video_path <DATASET_PATH> \
 	--annotation_path <JSON_PATH> \
 	--result_path <SAVE_WEIGHT_PATH> \

@@ -4,7 +4,6 @@ import argparse
 def parse_opts():
     parser = argparse.ArgumentParser()
 
-
     # input opt
     parser.add_argument('--video_path', default='video_kinetics_jpg', type=str, help='Directory path of Videos')
     parser.add_argument('--annotation_path', default='kinetics.json', type=str, help='Annotation file path')

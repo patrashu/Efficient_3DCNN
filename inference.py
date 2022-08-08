@@ -20,6 +20,9 @@ names = [
     'Idle'
 ]
 
+correct_pred = {classname: 0 for classname in names}
+total_pred = {classname: 0 for classname in names} 
+
 ## output stack 후 mean => topk
 def calculate_video_results(output_buffer, video_id, test_results, names):
     video_outputs = torch.stack(output_buffer)
@@ -32,6 +35,9 @@ def calculate_video_results(output_buffer, video_id, test_results, names):
             'label': names[int(locs[i])],
             'score': float(sorted_scores[i])
         })
+
+    correct_pred[names[label]] += 1
+    total_pred[names[label]] += 1
 
     test_results['results'][video_id] = video_results
 
@@ -50,7 +56,6 @@ def test(data_loader, model, opt, class_names):
     test_results = {'results': {}}
 
     for i, (inputs, targets) in enumerate(data_loader):
-        print(targets)
         data_time.update(time.time() - end_time)
 
         with torch.no_grad():
